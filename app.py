@@ -653,7 +653,40 @@ with sim_left:
 
 with sim_right:
     # ── FIXED: USING ST.MARKDOWN INSTEAD OF ST.IMAGE ────────────────────────
-   
+    st.markdown(f"""
+    <div class="sim-result-box">
+        <div style="font-size:1.8rem;margin-bottom:0.3rem">{strategy_icon}</div>
+        <div class="sim-result-value">{projected_reduction_pct:.2f}%</div>
+        <div class="sim-result-label">Projected OOSC Rate Reduction<br>per month · {strategy}</div>
+
+        <div class="sim-metric-row">
+            <div class="sim-metric">
+                <div class="sim-metric-val">{children_reached:,}</div>
+                <div class="sim-metric-lbl">Children Re-enrolled</div>
+            </div>
+            <div class="sim-metric">
+                <div class="sim-metric-val">{budget_display}</div>
+                <div class="sim-metric-lbl">Monthly Investment</div>
+            </div>
+        </div>
+
+        <div class="sim-metric-row">
+            <div class="sim-metric">
+                <div class="sim-metric-val">{schools_affected:,}</div>
+                <div class="sim-metric-lbl">Schools Impacted</div>
+            </div>
+            <div class="sim-metric">
+                <div class="sim-metric-val">PKR {cost_per_child:,.0f}</div>
+                <div class="sim-metric-lbl">Annual Cost / Child</div>
+            </div>
+        </div>
+
+        <div style="margin-top:1rem;font-size:0.72rem;color:rgba(255,255,255,0.5);text-align:left;line-height:1.5;">
+            <em>{notes}</em>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='margin-top:1rem'></div>", unsafe_allow_html=True)
