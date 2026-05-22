@@ -1,10 +1,8 @@
 # =============================================================================
 # ITA Education Emergency & ASER Data Tracker
-# Portfolio Project — Parwaaz Internship Application
-# Idara-e-Taleem-o-Aagahi (ITA)
-# =============================================================================
-# Architecture: Streamlit · Pandas · NumPy · Plotly · Folium
-# Author: Lokesh Kumar (Parwaaz Applicant Portfolio)
+# Portfolio Project for Parwaaz Internship — Idara-e-Taleem-o-Aagahi (ITA)
+# Author: Portfolio Candidate
+# Stack: Streamlit · Pandas · NumPy · Plotly · Folium · streamlit-folium
 # =============================================================================
 
 import streamlit as st
@@ -15,723 +13,1005 @@ import plotly.graph_objects as go
 import folium
 from streamlit_folium import st_folium
 
-# ── Page config must be the very first Streamlit call ─────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# PAGE CONFIG — Must be called first before any other Streamlit command
+# ─────────────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="ITA Education Emergency & ASER Data Tracker",
+    page_title="ITA Education Emergency Tracker",
     page_icon="📚",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# =============================================================================
-# SECTION 0 — CUSTOM CSS (Premium NGO Aesthetic)
-# Deep corporate blues (#003366) + intervention greens (#2CA02C)
-# Light theme, elevated cards, smooth hover effects
-# =============================================================================
+# ─────────────────────────────────────────────────────────────────────────────
+# PREMIUM CUSTOM CSS — Corporate NGO Aesthetic
+# Deep Blues (#003366) + Intervention Greens (#2CA02C) + Clean Light Theme
+# ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-/* ── Google Font Import ───────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-/* ── Global Reset & Base ──────────────────────────────────────────────── */
+/* ── CSS Variables ────────────────────────────────────────────────────────── */
+:root {
+    --navy:       #003366;
+    --navy-mid:   #004080;
+    --navy-light: #0055a5;
+    --green:      #2CA02C;
+    --green-light:#3dbf3d;
+    --green-pale: #e8f8e8;
+    --amber:      #E8860A;
+    --red:        #C0392B;
+    --bg:         #F4F6FA;
+    --surface:    #FFFFFF;
+    --border:     #DDE3EE;
+    --text-primary: #0D1B2A;
+    --text-secondary: #4A5568;
+    --text-muted:   #8A9BB0;
+    --shadow-sm:  0 2px 8px rgba(0,51,102,0.08);
+    --shadow-md:  0 6px 24px rgba(0,51,102,0.12);
+    --shadow-lg:  0 16px 48px rgba(0,51,102,0.16);
+    --radius:     12px;
+    --radius-lg:  18px;
+}
+
+/* ── Global Reset & Body ──────────────────────────────────────────────────── */
 html, body, [class*="css"] {
-    font-family: 'Inter', sans-serif;
-    background-color: #F4F6FA;
-    color: #1A1A2E;
+    font-family: 'DM Sans', sans-serif !important;
+    color: var(--text-primary) !important;
 }
 
-/* ── Hide Streamlit Default Chrome ───────────────────────────────────── */
-#MainMenu, footer, header { visibility: hidden; }
-.block-container {
-    padding: 1.5rem 2.5rem 2rem 2.5rem;
-    max-width: 1600px;
+.main .block-container {
+    padding: 0 2rem 3rem 2rem !important;
+    max-width: 1600px !important;
+    background: var(--bg) !important;
 }
 
-/* ── Hero Banner ─────────────────────────────────────────────────────── */
-.hero-banner {
-    background: linear-gradient(135deg, #003366 0%, #005599 60%, #0077CC 100%);
-    border-radius: 16px;
+/* Hide Streamlit default chrome */
+#MainMenu, footer, header { visibility: hidden !important; }
+.stDeployButton { display: none !important; }
+
+/* ── Header Banner ────────────────────────────────────────────────────────── */
+.ita-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
     padding: 2.2rem 2.8rem;
-    margin-bottom: 1.6rem;
-    box-shadow: 0 8px 32px rgba(0, 51, 102, 0.25);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    margin: -1rem -2rem 1.8rem -2rem;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-lg);
 }
-.hero-banner::before {
+
+.ita-header::before {
     content: '';
     position: absolute;
-    top: -40%;
-    right: -10%;
-    width: 420px;
-    height: 420px;
-    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+    top: -40px; right: -40px;
+    width: 280px; height: 280px;
+    background: rgba(44,160,44,0.15);
     border-radius: 50%;
+    pointer-events: none;
 }
-.hero-title {
-    color: #FFFFFF;
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin: 0 0 0.3rem 0;
+
+.ita-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 40%;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+    pointer-events: none;
 }
-.hero-subtitle {
-    color: rgba(255,255,255,0.78);
-    font-size: 0.95rem;
-    font-weight: 400;
-    margin: 0;
-}
-.hero-badge {
-    display: inline-block;
-    background: rgba(44, 160, 44, 0.85);
-    color: #fff;
+
+.ita-header-eyebrow {
     font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 1px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    margin-bottom: 0.8rem;
+    color: #7FB8FF;
+    margin-bottom: 0.5rem;
 }
 
-/* ── Filter Bar ──────────────────────────────────────────────────────── */
-.filter-bar {
-    background: #FFFFFF;
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1.6rem;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    border: 1px solid #E8EDF5;
+.ita-header h1 {
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 2.1rem !important;
+    font-weight: 400 !important;
+    color: #FFFFFF !important;
+    margin: 0 0 0.5rem 0 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.01em !important;
 }
-.filter-label {
-    font-size: 0.75rem;
+
+.ita-header-sub {
+    font-size: 0.92rem;
+    color: rgba(255,255,255,0.72);
+    font-weight: 400;
+    max-width: 680px;
+    line-height: 1.6;
+}
+
+.ita-header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(44,160,44,0.25);
+    border: 1px solid rgba(44,160,44,0.5);
+    color: #7EE87E;
+    font-size: 0.72rem;
     font-weight: 600;
-    color: #003366;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 0.3rem;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 1rem;
 }
 
-/* ── KPI Cards ───────────────────────────────────────────────────────── */
+/* ── Filter / Control Row ─────────────────────────────────────────────────── */
+.filter-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.4rem;
+    margin-bottom: 1.6rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filter-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* ── KPI Cards ────────────────────────────────────────────────────────────── */
 .kpi-card {
-    background: #FFFFFF;
-    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 1.4rem 1.6rem;
-    box-shadow: 0 4px 20px rgba(0, 51, 102, 0.10);
-    border: 1px solid #E4EBF5;
-    border-top: 4px solid #003366;
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
     height: 100%;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.kpi-card.red::before   { background: var(--red); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-card.amber::before { background: var(--amber); }
+.kpi-card.blue::before  { background: var(--navy-light); }
+
+.kpi-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+    display: block;
+}
+
+.kpi-label {
+    font-size: 0.73rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.kpi-value.red   { color: var(--red); }
+.kpi-value.green { color: var(--green); }
+.kpi-value.amber { color: var(--amber); }
+.kpi-value.blue  { color: var(--navy-light); }
+
+.kpi-delta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kpi-delta.up   { color: var(--green); }
+.kpi-delta.down { color: var(--red); }
+
+/* ── Section Headers ──────────────────────────────────────────────────────── */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.8rem 0 1rem 0;
+}
+
+.section-header h2 {
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 1.3rem !important;
+    font-weight: 400 !important;
+    color: var(--navy) !important;
+    margin: 0 !important;
+}
+
+.section-pill {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--green-pale);
+    color: var(--green);
+    border: 1px solid rgba(44,160,44,0.25);
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+/* ── Chart / Map Containers ───────────────────────────────────────────────── */
+.chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    box-shadow: var(--shadow-sm);
+    height: 100%;
+}
+
+.chart-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+}
+
+/* ── Simulator Panel ──────────────────────────────────────────────────────── */
+.simulator-panel {
+    background: linear-gradient(135deg, var(--navy) 0%, #001f4d 100%);
+    border-radius: var(--radius-lg);
+    padding: 2rem 2.4rem;
+    box-shadow: var(--shadow-lg);
+    margin-top: 0.5rem;
     position: relative;
     overflow: hidden;
 }
-.kpi-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 32px rgba(0, 51, 102, 0.18);
-}
-.kpi-card.green { border-top-color: #2CA02C; }
-.kpi-card.amber { border-top-color: #E07B00; }
-.kpi-card.red   { border-top-color: #C0392B; }
 
-.kpi-icon {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-.kpi-label {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #6B7A99;
-    text-transform: uppercase;
-    letter-spacing: 0.9px;
-    margin-bottom: 0.4rem;
-}
-.kpi-value {
-    font-size: 2.1rem;
-    font-weight: 800;
-    color: #003366;
-    line-height: 1;
-    margin-bottom: 0.3rem;
-}
-.kpi-value.green { color: #2CA02C; }
-.kpi-value.amber { color: #E07B00; }
-.kpi-value.red   { color: #C0392B; }
-.kpi-delta {
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: #8896B0;
+.simulator-panel::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 250px; height: 250px;
+    background: rgba(44,160,44,0.08);
+    border-radius: 50%;
 }
 
-/* ── Section Headers ─────────────────────────────────────────────────── */
-.section-header {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #003366;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #E4EBF5;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* ── Chart Container ─────────────────────────────────────────────────── */
-.chart-card {
-    background: #FFFFFF;
-    border-radius: 14px;
-    padding: 1.4rem 1.6rem;
-    box-shadow: 0 4px 20px rgba(0, 51, 102, 0.08);
-    border: 1px solid #E4EBF5;
-}
-
-/* ── Simulator Panel ─────────────────────────────────────────────────── */
-.simulator-panel {
-    background: linear-gradient(135deg, #003366 0%, #004F8B 100%);
-    border-radius: 16px;
-    padding: 2rem 2.4rem;
-    margin-top: 1.6rem;
-    box-shadow: 0 8px 32px rgba(0, 51, 102, 0.22);
-}
 .simulator-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.45rem;
+    font-weight: 400;
     color: #FFFFFF;
-    font-size: 1.25rem;
-    font-weight: 700;
     margin-bottom: 0.3rem;
 }
+
 .simulator-subtitle {
-    color: rgba(255,255,255,0.65);
     font-size: 0.85rem;
-    margin-bottom: 1.5rem;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 1.6rem;
 }
+
 .sim-result-box {
-    background: rgba(255,255,255,0.10);
-    border-radius: 12px;
-    padding: 1.6rem;
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(44,160,44,0.15);
+    border: 1px solid rgba(44,160,44,0.4);
+    border-radius: var(--radius);
+    padding: 1.4rem 2rem;
     text-align: center;
 }
-.sim-result-value {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: #2CA02C;
-    line-height: 1;
-}
+
 .sim-result-label {
-    color: rgba(255,255,255,0.8);
-    font-size: 0.88rem;
-    margin-top: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7EE87E;
+    margin-bottom: 0.5rem;
 }
-.sim-metric-row {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-.sim-metric {
-    flex: 1;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 0.9rem 1rem;
-    border: 1px solid rgba(255,255,255,0.12);
-}
-.sim-metric-val {
-    font-size: 1.4rem;
+
+.sim-result-value {
+    font-size: 3rem;
     font-weight: 700;
     color: #FFFFFF;
-}
-.sim-metric-lbl {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
 }
 
-/* ── Streamlit widget overrides ───────────────────────────────────────── */
-div[data-testid="stSelectbox"] > div:first-child,
-div[data-testid="stMultiSelect"] > div:first-child {
+.sim-result-unit {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 0.3rem;
+}
+
+.sim-reach-item {
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.6rem;
+}
+
+.sim-reach-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 0.25rem;
+}
+
+.sim-reach-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+/* ── Streamlit Component Overrides ───────────────────────────────────────── */
+div[data-testid="stSelectbox"] > div > div {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 8px !important;
-}
-div[data-testid="stSlider"] .stSlider { padding: 0; }
-.stRadio > label { color: rgba(255,255,255,0.85) !important; font-size: 0.88rem; }
-.stRadio > div { gap: 1.2rem; }
-
-/* ── Divider ─────────────────────────────────────────────────────────── */
-.custom-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #D0DAF0, transparent);
-    margin: 1.8rem 0;
+    color: var(--text-primary) !important;
 }
 
-/* ── Map container rounded corners ───────────────────────────────────── */
-iframe { border-radius: 12px; }
+div[data-testid="stSlider"] > div > div > div {
+    background: var(--navy-light) !important;
+}
 
+div[data-testid="stSlider"] [data-testid="stThumbValue"] {
+    background: var(--navy) !important;
+    color: white !important;
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 0.75rem !important;
+}
+
+.stRadio > div {
+    gap: 8px !important;
+}
+
+.stRadio > div > label {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1.2rem !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+}
+
+.stRadio > div > label:hover {
+    border-color: var(--navy-light) !important;
+    color: var(--navy) !important;
+}
+
+/* Mono font for data values */
+.mono { font-family: 'IBM Plex Mono', monospace !important; }
+
+/* Divider */
+.ita-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+}
+
+/* Map container */
+.map-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+/* Streamlit metric override */
+[data-testid="metric-container"] {
+    display: none !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
 
-# =============================================================================
-# SECTION 1 — SYNTHETIC DATA GENERATION
-# High-fidelity, ASER-aligned district-level data for Pakistan
-# Cached for performance — only regenerates on cache miss
-# =============================================================================
-
+# ─────────────────────────────────────────────────────────────────────────────
+# SYNTHETIC DATA GENERATION
+# Highly realistic district-level education data for 15+ Pakistani districts
+# Cached with @st.cache_data for performance — only runs once per session
+# ─────────────────────────────────────────────────────────────────────────────
 @st.cache_data
-def generate_district_data() -> pd.DataFrame:
-    np.random.seed(42)  
+def generate_education_data() -> pd.DataFrame:
+    """
+    Generates a high-fidelity synthetic dataset modeling education metrics
+    for 18 Pakistani districts across 4 provinces. Values are calibrated
+    against real ASER Pakistan and UNICEF OOSC reports for plausibility.
+
+    Returns:
+        pd.DataFrame: District-level education metrics with lat/lon coordinates.
+    """
+    np.random.seed(42)  # Reproducibility
 
     districts = [
-        ("Karachi",       "Sindh",       "Urban",  24.8607,  67.0011),
-        ("Hyderabad",     "Sindh",       "Urban",  25.3960,  68.3578),
-        ("Sukkur",        "Sindh",       "Rural",  27.7052,  68.8574),
-        ("Jacobabad",     "Sindh",       "Rural",  28.2769,  68.4514),
-        ("Tharparkar",    "Sindh",       "Rural",  24.7161,  70.2433),
-        ("Lahore",        "Punjab",      "Urban",  31.5204,  74.3587),
-        ("Multan",        "Punjab",      "Urban",  30.1575,  71.5249),
-        ("Rahim Yar Khan","Punjab",      "Rural",  28.4200,  70.2950),
-        ("Muzaffargarh",  "Punjab",      "Rural",  30.0722,  71.1931),
-        ("D.G. Khan",     "Punjab",      "Rural",  30.0489,  70.6341),
-        ("Peshawar",      "KPK",         "Urban",  34.0151,  71.5249),
-        ("Swat",          "KPK",         "Rural",  35.2227,  72.4258),
-        ("D.I. Khan",     "KPK",         "Rural",  31.8314,  70.9017),
-        ("Kohistan",      "KPK",         "Rural",  35.5000,  73.0000),
-        ("Quetta",        "Balochistan", "Urban",  30.1798,  66.9750),
-        ("Khuzdar",       "Balochistan", "Rural",  27.8118,  66.6173),
-        ("Turbat",        "Balochistan", "Rural",  26.0025,  63.0422),
-        ("Chaghai",       "Balochistan", "Rural",  29.0000,  64.7000),
-        ("Killa Abdullah","Balochistan", "Rural",  30.6833,  66.5833),
-        ("Lasbela",       "Balochistan", "Rural",  26.2000,  66.2167),
+        # (name, province, zone, lat, lon, base_oosc_pct, base_literacy, infra_gap)
+        ("Karachi Central",  "Sindh",       "Urban", 24.860, 67.010, 0.21, 0.68, 0.35),
+        ("Larkana",          "Sindh",       "Rural", 27.559, 68.215, 0.49, 0.38, 0.72),
+        ("Tharparkar",       "Sindh",       "Rural", 24.739, 69.793, 0.62, 0.28, 0.85),
+        ("Hyderabad",        "Sindh",       "Urban", 25.396, 68.374, 0.29, 0.58, 0.42),
+        ("Sukkur",           "Sindh",       "Rural", 27.705, 68.857, 0.44, 0.41, 0.65),
+
+        ("Lahore",           "Punjab",      "Urban", 31.548, 74.343, 0.14, 0.77, 0.22),
+        ("Multan",           "Punjab",      "Urban", 30.157, 71.524, 0.22, 0.62, 0.38),
+        ("Rahim Yar Khan",   "Punjab",      "Rural", 28.420, 70.295, 0.38, 0.47, 0.58),
+        ("D.G. Khan",        "Punjab",      "Rural", 30.048, 70.635, 0.41, 0.44, 0.62),
+        ("Bahawalpur",       "Punjab",      "Rural", 29.395, 71.678, 0.33, 0.51, 0.52),
+
+        ("Peshawar",         "KPK",         "Urban", 34.009, 71.678, 0.18, 0.71, 0.28),
+        ("Swat",             "KPK",         "Rural", 35.221, 72.421, 0.35, 0.49, 0.55),
+        ("Khyber",           "KPK",         "Rural", 34.100, 71.085, 0.45, 0.39, 0.68),
+
+        ("Quetta",           "Balochistan", "Urban", 30.183, 67.007, 0.31, 0.52, 0.48),
+        ("Turbat",           "Balochistan", "Rural", 26.003, 63.058, 0.58, 0.31, 0.79),
+        ("Khuzdar",          "Balochistan", "Rural", 27.812, 66.620, 0.54, 0.34, 0.76),
+        ("Gwadar",           "Balochistan", "Rural", 25.122, 62.325, 0.47, 0.39, 0.70),
+        ("Loralai",          "Balochistan", "Rural", 30.372, 68.592, 0.50, 0.36, 0.74),
     ]
 
-    records = []
+    rows = []
+    for d in districts:
+        name, province, zone, lat, lon, oosc_base, lit_base, infra_gap = d
 
-    for district, province, zone, lat, lon in districts:
-        base_oosc = {
-            ("Sindh",       "Urban"):  0.22,
-            ("Sindh",       "Rural"):  0.42,
-            ("Punjab",      "Urban"):  0.15,
-            ("Punjab",      "Rural"):  0.32,
-            ("KPK",         "Urban"):  0.20,
-            ("KPK",         "Rural"):  0.48,
-            ("Balochistan", "Urban"):  0.28,
-            ("Balochistan", "Rural"):  0.62,
-        }.get((province, zone), 0.35)
+        # Add realistic noise to base values
+        noise = np.random.normal(0, 0.03)
 
-        oosc_rate = float(np.clip(np.random.normal(base_oosc, 0.05), 0.05, 0.80))
-        school_age_pop = int(np.random.randint(80_000, 650_000))
-        oosc_count     = int(school_age_pop * oosc_rate)
-        enrolled       = school_age_pop - oosc_count
-        literacy_rate = float(np.clip(np.random.normal(0.82 - oosc_rate * 0.8, 0.04), 0.22, 0.90))
-        dropout_rate = float(np.clip(np.random.normal(oosc_rate * 0.55, 0.03), 0.04, 0.55))
-        infra_deficit = float(np.clip(np.random.normal(oosc_rate * 0.75, 0.06), 0.05, 0.90))
-        teacher_qualified_rate = float(np.clip(np.random.normal(0.78 - oosc_rate * 0.4, 0.05), 0.30, 0.95))
-        school_count = int(np.random.randint(120, 1800))
-        cause_weights = np.random.dirichlet(alpha=[3.5, 2.0, 1.8, 2.2, 0.5])
-        
-        ros = float(np.clip((literacy_rate * 40) + ((1 - oosc_rate) * 30) + ((1 - infra_deficit) * 20) + (teacher_qualified_rate * 10), 0, 100))
-        gpi = float(np.clip(np.random.normal(0.88 - oosc_rate * 0.25, 0.06), 0.40, 1.05))
+        total_children    = int(np.random.uniform(80_000, 420_000))
+        oosc_pct          = np.clip(oosc_base + noise, 0.05, 0.90)
+        oosc_count        = int(total_children * oosc_pct)
+        enrolled          = total_children - oosc_count
+        dropout_rate      = np.clip(np.random.uniform(0.08, 0.30) + (oosc_pct * 0.2), 0.05, 0.45)
+        literacy_rate     = np.clip(lit_base + np.random.normal(0, 0.04), 0.15, 0.92)
+        infra_lacking_pct = np.clip(infra_gap + np.random.normal(0, 0.05), 0.10, 0.95)
+        teacher_ratio     = np.random.randint(28, 72)  # students per teacher
+        schools_total     = int(np.random.uniform(150, 900))
+        schools_no_water  = int(schools_total * np.random.uniform(0.1, 0.55))
+        schools_no_toilet = int(schools_total * np.random.uniform(0.15, 0.60))
 
-        records.append({
-            "District":               district,
-            "Province":               province,
-            "Zone":                   zone,
-            "Latitude":               lat,
-            "Longitude":              lon,
-            "School_Age_Population":  school_age_pop,
-            "OOSC_Count":             oosc_count,
-            "OOSC_Rate":              round(oosc_rate, 4),
-            "Enrolled":               enrolled,
-            "Literacy_Rate":          round(literacy_rate, 4),
-            "Dropout_Rate":           round(dropout_rate, 4),
-            "Infra_Deficit_Rate":     round(infra_deficit, 4),
-            "Teacher_Qualified_Rate": round(teacher_qualified_rate, 4),
-            "School_Count":           school_count,
-            "GPI":                    round(gpi, 3),
-            "ROS":                    round(ros, 2),
-            "Cause_Economic":         round(cause_weights[0], 3),
-            "Cause_Distance":         round(cause_weights[1], 3),
-            "Cause_Facilities":       round(cause_weights[2], 3),
-            "Cause_ChildLabor":       round(cause_weights[3], 3),
-            "Cause_Other":            round(cause_weights[4], 3),
+        # Dropout cause breakdown (sums to 100)
+        economic  = np.random.uniform(0.25, 0.45)
+        distance  = np.random.uniform(0.15, 0.30)
+        child_lab = np.random.uniform(0.10, 0.25)
+        no_fac    = 1.0 - economic - distance - child_lab
+
+        # Composite resource optimization score (0–100, higher = better)
+        opt_score = round(
+            (literacy_rate * 0.35 +
+             (1 - oosc_pct) * 0.35 +
+             (1 - infra_lacking_pct) * 0.30) * 100, 1
+        )
+
+        rows.append({
+            "District":            name,
+            "Province":            province,
+            "Zone":                zone,
+            "Latitude":            lat,
+            "Longitude":           lon,
+            "Total_Children":      total_children,
+            "OOSC_Count":          oosc_count,
+            "OOSC_Pct":            round(oosc_pct * 100, 1),
+            "Enrolled":            enrolled,
+            "Dropout_Rate":        round(dropout_rate * 100, 1),
+            "Literacy_Rate":       round(literacy_rate * 100, 1),
+            "Infra_Lacking_Pct":   round(infra_lacking_pct * 100, 1),
+            "Teacher_Ratio":       teacher_ratio,
+            "Schools_Total":       schools_total,
+            "Schools_No_Water":    schools_no_water,
+            "Schools_No_Toilet":   schools_no_toilet,
+            "Cause_Economic":      round(economic * 100, 1),
+            "Cause_Distance":      round(distance * 100, 1),
+            "Cause_ChildLabor":    round(child_lab * 100, 1),
+            "Cause_NoFacilities":  round(no_fac * 100, 1),
+            "Opt_Score":           opt_score,
         })
 
-    return pd.DataFrame(records)
+    return pd.DataFrame(rows)
 
 
-# =============================================================================
-# SECTION 2 — LOAD DATA
-# =============================================================================
-raw_df = generate_district_data()
-
-
-# =============================================================================
-# SECTION 3 — HERO BANNER
-# =============================================================================
-st.markdown("""
-<div class="hero-banner">
-    <span class="hero-badge">🇵🇰 Parwaaz Internship — Portfolio Flagship Project</span>
-    <div class="hero-title">📚 ITA Education Emergency & ASER Data Tracker</div>
-    <div class="hero-subtitle">
-        Real-time district intelligence for Out-of-School Children · Literacy Outcomes ·
-        Infrastructure Gaps · Intervention Simulation &nbsp;|&nbsp;
-        <strong style="color:rgba(255,255,255,0.9)">Idara-e-Taleem-o-Aagahi (ITA)</strong>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-
-# =============================================================================
-# SECTION 4 — GLOBAL FILTERS
-# =============================================================================
-st.markdown('<div class="filter-bar">', unsafe_allow_html=True)
-
-f_col1, f_col2, f_col3 = st.columns([1, 1, 2])
-
-with f_col1:
-    st.markdown('<div class="filter-label">🏛️ Province</div>', unsafe_allow_html=True)
-    province_options = ["All Provinces"] + sorted(raw_df["Province"].unique().tolist())
-    selected_province = st.selectbox("Province", province_options, label_visibility="collapsed")
-
-with f_col2:
-    st.markdown('<div class="filter-label">🏙️ Zone</div>', unsafe_allow_html=True)
-    zone_options = ["Urban & Rural", "Urban", "Rural"]
-    selected_zone = st.selectbox("Zone", zone_options, label_visibility="collapsed")
-
-with f_col3:
-    st.markdown('<div class="filter-label" style="padding-top:0.1rem;">ℹ️ Data Source</div>', unsafe_allow_html=True)
-    st.caption("Synthetic data calibrated against **ASER Pakistan 2021–2023**, PSLM surveys, and Pakistan Education Statistics. 20 districts across Sindh, Punjab, KPK, Balochistan.")
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-
-df = raw_df.copy()
-if selected_province != "All Provinces": df = df[df["Province"] == selected_province]
-if selected_zone != "Urban & Rural": df = df[df["Zone"] == selected_zone]
-
-if df.empty:
-    st.warning("⚠️ No districts match the selected filters. Try broadening your Province or Zone selection.")
-    st.stop()
-
-
-# =============================================================================
-# SECTION 5 — STRATEGIC KPI ROW
-# =============================================================================
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-
-total_oosc      = df["OOSC_Count"].sum()
-avg_literacy    = df["Literacy_Rate"].mean() * 100
-infra_pct       = df["Infra_Deficit_Rate"].mean() * 100
-avg_ros         = df["ROS"].mean()
-
-with kpi1:
-    st.markdown(f"""
-    <div class="kpi-card red">
-        <span class="kpi-icon">🚸</span>
-        <div class="kpi-label">Total Simulated OOSC</div>
-        <div class="kpi-value red">{total_oosc:,.0f}</div>
-        <div class="kpi-delta">Out-of-School Children · Filtered View</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with kpi2:
-    st.markdown(f"""
-    <div class="kpi-card green">
-        <span class="kpi-icon">📖</span>
-        <div class="kpi-label">Avg Foundational Literacy</div>
-        <div class="kpi-value green">{avg_literacy:.1f}%</div>
-        <div class="kpi-delta">Adults 15+ · ASER Benchmark ≥ 80%</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with kpi3:
-    st.markdown(f"""
-    <div class="kpi-card amber">
-        <span class="kpi-icon">🏚️</span>
-        <div class="kpi-label">Schools: Infra Deficit</div>
-        <div class="kpi-value amber">{infra_pct:.1f}%</div>
-        <div class="kpi-delta">Lacking WASH, Electricity, or Boundary Wall</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with kpi4:
-    ros_color = "green" if avg_ros >= 60 else ("amber" if avg_ros >= 40 else "red")
-    st.markdown(f"""
-    <div class="kpi-card {ros_color}">
-        <span class="kpi-icon">⚡</span>
-        <div class="kpi-label">Resource Optimization Score</div>
-        <div class="kpi-value {ros_color}">{avg_ros:.1f}<span style="font-size:1.1rem;font-weight:500"> /100</span></div>
-        <div class="kpi-delta">Composite: Literacy + Enrollment + Infra</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("<div style='margin-top:1.6rem'></div>", unsafe_allow_html=True)
-
-
-# =============================================================================
-# SECTION 6 — GEOSPATIAL INTELLIGENCE MAP
-# =============================================================================
-st.markdown('<div class="section-header">🗺️ Geospatial Intelligence — District OOSC Severity Map</div>', unsafe_allow_html=True)
-
-map_center_lat = df["Latitude"].mean()
-map_center_lon = df["Longitude"].mean()
-zoom_start     = 6 if selected_province == "All Provinces" else 7
-
-m = folium.Map(location=[map_center_lat, map_center_lon], zoom_start=zoom_start, tiles="CartoDB positron", attr="© OpenStreetMap, © CARTO")
-
-def oosc_to_color(rate: float) -> str:
-    r = max(0.0, min(1.0, rate))
-    if r < 0.20:   return "#2CA02C"   
-    elif r < 0.35: return "#8DB600"   
-    elif r < 0.50: return "#E07B00"   
-    elif r < 0.65: return "#D62728"   
-    else:          return "#7B0000"   
-
-for _, row in df.iterrows():
-    color = oosc_to_color(row["OOSC_Rate"])
-    radius = int(8000 + row["OOSC_Count"] / 20)
-
-    popup_html = f"""
-    <div style="font-family:Inter,sans-serif;min-width:220px;">
-        <div style="background:#003366;color:#fff;padding:8px 12px;border-radius:6px 6px 0 0;font-weight:700;font-size:13px;">
-            {row['District']}, {row['Province']}
-        </div>
-        <div style="padding:10px 12px;background:#fff;border-radius:0 0 6px 6px;border:1px solid #E4EBF5;">
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-                <tr><td style="color:#6B7A99;padding:3px 0">Zone</td><td style="font-weight:600;text-align:right">{row['Zone']}</td></tr>
-                <tr><td style="color:#6B7A99;padding:3px 0">OOSC Count</td><td style="font-weight:700;color:#C0392B;text-align:right">{row['OOSC_Count']:,}</td></tr>
-                <tr><td style="color:#6B7A99;padding:3px 0">OOSC Rate</td><td style="font-weight:600;text-align:right">{row['OOSC_Rate']*100:.1f}%</td></tr>
-                <tr><td style="color:#6B7A99;padding:3px 0">Literacy Rate</td><td style="font-weight:600;color:#2CA02C;text-align:right">{row['Literacy_Rate']*100:.1f}%</td></tr>
-                <tr><td style="color:#6B7A99;padding:3px 0">Infra Deficit</td><td style="font-weight:600;color:#E07B00;text-align:right">{row['Infra_Deficit_Rate']*100:.1f}%</td></tr>
-                <tr><td style="color:#6B7A99;padding:3px 0">ROS Score</td><td style="font-weight:600;text-align:right">{row['ROS']:.1f}/100</td></tr>
-            </table>
-        </div>
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPER: KPI Card HTML
+# ─────────────────────────────────────────────────────────────────────────────
+def kpi_card(icon: str, label: str, value: str, delta: str, color: str) -> str:
+    """Returns styled HTML for a single KPI metric card."""
+    delta_class = "up" if "▲" in delta else ("down" if "▼" in delta else "")
+    return f"""
+    <div class="kpi-card {color}">
+        <span class="kpi-icon">{icon}</span>
+        <div class="kpi-label">{label}</div>
+        <div class="kpi-value {color} mono">{value}</div>
+        <div class="kpi-delta {delta_class}">{delta}</div>
     </div>
     """
 
-    folium.Circle(
-        location=[row["Latitude"], row["Longitude"]],
-        radius=radius, color=color, fill=True, fill_color=color, fill_opacity=0.55, weight=2,
-        popup=folium.Popup(popup_html, max_width=260),
-        tooltip=folium.Tooltip(f"<b>{row['District']}</b> · OOSC: {row['OOSC_Rate']*100:.1f}%", sticky=True)
-    ).add_to(m)
 
-    folium.Marker(
-        location=[row["Latitude"], row["Longitude"]],
-        icon=folium.DivIcon(html=f'<div style="font-family:Inter,sans-serif;font-size:10px;font-weight:600;color:#003366;white-space:nowrap;text-shadow:1px 1px 2px #fff,-1px -1px 2px #fff;">{row["District"]}</div>', icon_size=(120, 20), icon_anchor=(60, 10))
-    ).add_to(m)
-
-st_folium(m, use_container_width=True, height=520, returned_objects=[])
-
-leg1, leg2, leg3, leg4, leg5 = st.columns(5)
-legend_data = [("#2CA02C", "< 20% OOSC", "Optimal"), ("#8DB600", "20–35% OOSC", "Moderate"), ("#E07B00", "35–50% OOSC", "Elevated"), ("#D62728", "50–65% OOSC", "Severe"), ("#7B0000", "> 65% OOSC",  "Critical")]
-for col, (color, range_lbl, status) in zip([leg1, leg2, leg3, leg4, leg5], legend_data):
-    with col:
-        st.markdown(f'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;"><div style="width:16px;height:16px;border-radius:50%;background:{color};flex-shrink:0"></div><div><div style="font-size:0.75rem;font-weight:600;color:#1A1A2E">{range_lbl}</div><div style="font-size:0.68rem;color:#6B7A99">{status}</div></div></div>', unsafe_allow_html=True)
-
-st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
-
-
-# =============================================================================
-# SECTION 7 — DIAGNOSTIC ANALYTICS
-# =============================================================================
-st.markdown('<div class="section-header">📊 Diagnostic Analytics — Enrollment, Dropout & Causal Breakdown</div>', unsafe_allow_html=True)
-
-chart_left, chart_right = st.columns([3, 2], gap="large")
-
-with chart_left:
-    top_districts = df.nlargest(10, "OOSC_Count").sort_values("OOSC_Count")
-    bar_fig = go.Figure()
-    bar_fig.add_trace(go.Bar(name="Enrolled Children", y=top_districts["District"], x=top_districts["Enrolled"], orientation="h", marker_color="#003366", hovertemplate="<b>%{y}</b><br>Enrolled: %{x:,.0f}<extra></extra>"))
-    bar_fig.add_trace(go.Bar(name="Out-of-School (OOSC)", y=top_districts["District"], x=top_districts["OOSC_Count"], orientation="h", marker_color="#C0392B", hovertemplate="<b>%{y}</b><br>OOSC: %{x:,.0f}<extra></extra>"))
-    
-    bar_fig.update_layout(
-        barmode="stack", title={"text": "Enrollment vs. Out-of-School Children", "font": {"family": "Inter", "size": 14, "color": "#003366"}},
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={"family": "Inter", "size": 11, "color": "#4A4A6A"},
-        legend={"orientation": "h", "y": -0.18, "x": 0, "font": {"size": 11}},
-        xaxis={"gridcolor": "#F0F0F5", "zerolinecolor": "#E4EBF5", "tickformat": ",.0f"}, yaxis={"gridcolor": "#F0F0F5"},
-        margin={"l": 10, "r": 20, "t": 50, "b": 60}, height=420,
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPER: Folium Map Builder
+# ─────────────────────────────────────────────────────────────────────────────
+def build_folium_map(df: pd.DataFrame) -> folium.Map:
+    """
+    Constructs an interactive Folium choropleth-style map with color-coded
+    heat circles per district. Circle color encodes OOSC severity.
+    Red = high burden, Yellow = moderate, Green = low burden.
+    """
+    # Center map on Pakistan
+    m = folium.Map(
+        location=[29.5, 68.5],
+        zoom_start=5,
+        tiles="CartoDB positron",
+        control_scale=True,
     )
-    st.plotly_chart(bar_fig, use_container_width=True)
 
-with chart_right:
-    cause_cols = ["Cause_Economic", "Cause_Distance", "Cause_Facilities", "Cause_ChildLabor", "Cause_Other"]
-    cause_labels = ["Economic Hardship", "School Distance", "Lack of Facilities", "Child Labor", "Other"]
-    cause_colors = ["#C0392B", "#E07B00", "#003366", "#8B008B", "#6B7A99"]
+    # Color scale: green → yellow → red based on OOSC percentage
+    def oosc_to_color(pct: float) -> str:
+        if pct < 25:   return "#2CA02C"   # green  — low severity
+        elif pct < 40: return "#E8860A"   # amber  — moderate
+        elif pct < 55: return "#D62728"   # red    — high
+        else:          return "#7B0D1E"   # deep red — critical
 
-    df_cause = df.copy()
-    df_cause["dropout_count"] = df_cause["School_Age_Population"] * df_cause["Dropout_Rate"]
-    cause_totals = [(df_cause[col] * df_cause["dropout_count"]).sum() for col in cause_cols]
+    for _, row in df.iterrows():
+        color  = oosc_to_color(row["OOSC_Pct"])
+        radius = int(row["OOSC_Pct"] * 700)  # scale circle to severity
 
-    donut_fig = go.Figure(go.Pie(labels=cause_labels, values=cause_totals, hole=0.55, marker={"colors": cause_colors, "line": {"color": "#FFFFFF", "width": 2}}))
-    donut_fig.add_annotation(text="Dropout<br>Causes", x=0.5, y=0.5, font={"family": "Inter", "size": 13, "color": "#003366"}, showarrow=False)
-    donut_fig.update_layout(
-        title={"text": "Primary Causes of Student Dropout", "font": {"family": "Inter", "size": 14, "color": "#003366"}},
-        paper_bgcolor="rgba(0,0,0,0)", font={"family": "Inter", "size": 11, "color": "#4A4A6A"},
-        legend={"font": {"size": 11}, "itemsizing": "constant"},
-        margin={"l": 10, "r": 10, "t": 50, "b": 20}, height=420, showlegend=True,
-    )
-    st.plotly_chart(donut_fig, use_container_width=True)
+        popup_html = f"""
+        <div style="font-family:DM Sans,sans-serif;min-width:220px;padding:4px;">
+            <div style="font-size:13px;font-weight:700;color:#003366;border-bottom:2px solid #003366;padding-bottom:6px;margin-bottom:8px;">
+                📍 {row['District']}
+            </div>
+            <table style="width:100%;font-size:11.5px;border-collapse:collapse;">
+                <tr><td style="color:#666;padding:3px 0;">Province</td>
+                    <td style="font-weight:600;text-align:right;">{row['Province']}</td></tr>
+                <tr><td style="color:#666;padding:3px 0;">Zone</td>
+                    <td style="font-weight:600;text-align:right;">{row['Zone']}</td></tr>
+                <tr style="background:#fff3f3;"><td style="color:#C0392B;padding:3px 4px;font-weight:600;">OOSC</td>
+                    <td style="font-weight:700;color:#C0392B;text-align:right;">{row['OOSC_Count']:,} ({row['OOSC_Pct']}%)</td></tr>
+                <tr><td style="color:#666;padding:3px 0;">Literacy Rate</td>
+                    <td style="font-weight:600;text-align:right;">{row['Literacy_Rate']}%</td></tr>
+                <tr><td style="color:#666;padding:3px 0;">Dropout Rate</td>
+                    <td style="font-weight:600;text-align:right;">{row['Dropout_Rate']}%</td></tr>
+                <tr><td style="color:#666;padding:3px 0;">Infra Gap</td>
+                    <td style="font-weight:600;text-align:right;">{row['Infra_Lacking_Pct']}%</td></tr>
+                <tr style="background:#f0f8f0;"><td style="color:#2CA02C;padding:3px 4px;font-weight:600;">Opt. Score</td>
+                    <td style="font-weight:700;color:#2CA02C;text-align:right;">{row['Opt_Score']}/100</td></tr>
+            </table>
+        </div>
+        """
 
-st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+        folium.CircleMarker(
+            location=[row["Latitude"], row["Longitude"]],
+            radius=max(12, min(radius // 100, 40)),
+            color=color,
+            fill=True,
+            fill_color=color,
+            fill_opacity=0.55,
+            weight=2,
+            popup=folium.Popup(popup_html, max_width=260),
+            tooltip=f"<b>{row['District']}</b> — OOSC: {row['OOSC_Pct']}%",
+        ).add_to(m)
 
-
-# =============================================================================
-# SECTION 8 — SUPPLEMENTARY ANALYTICS
-# =============================================================================
-st.markdown('<div class="section-header">🔍 Deep-Dive Analytics — Literacy Correlations & Teacher Workforce</div>', unsafe_allow_html=True)
-
-deep_left, deep_right = st.columns(2, gap="large")
-
-with deep_left:
-    scatter_fig = px.scatter(
-        df, x="OOSC_Rate", y="Literacy_Rate", size="School_Age_Population", color="Province", hover_name="District",
-        color_discrete_map={"Sindh": "#C0392B", "Punjab": "#003366", "KPK": "#2CA02C", "Balochistan": "#E07B00"},
-        title="Literacy Rate vs. OOSC Rate (bubble = school-age pop)", labels={"OOSC_Rate": "OOSC Rate", "Literacy_Rate": "Adult Literacy Rate"}, size_max=40,
-    )
-    scatter_fig.update_traces(marker_opacity=0.75, marker_line_width=1.5, marker_line_color="white")
-    scatter_fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={"family": "Inter", "size": 11},
-        xaxis={"tickformat": ".0%", "gridcolor": "#F0F0F5"}, yaxis={"tickformat": ".0%", "gridcolor": "#F0F0F5"},
-        title_font={"family": "Inter", "size": 13, "color": "#003366"}, margin={"l": 10, "r": 10, "t": 50, "b": 20}, height=380,
-    )
-    st.plotly_chart(scatter_fig, use_container_width=True)
-
-with deep_right:
-    tq_df = df.groupby("Province")["Teacher_Qualified_Rate"].mean().reset_index().sort_values("Teacher_Qualified_Rate")
-    tq_df["Pct"] = tq_df["Teacher_Qualified_Rate"] * 100
-    tq_colors = {"Balochistan": "#C0392B", "Sindh": "#E07B00", "KPK": "#8DB600", "Punjab": "#2CA02C"}
-
-    tq_fig = go.Figure(go.Bar(
-        x=tq_df["Pct"], y=tq_df["Province"], orientation="h",
-        marker_color=[tq_colors.get(p, "#003366") for p in tq_df["Province"]],
-        text=[f"{v:.1f}%" for v in tq_df["Pct"]], textposition="outside",
-    ))
-    tq_fig.add_vline(x=80, line_dash="dash", line_color="#003366", line_width=1.5, annotation_text="80% Target", annotation_position="top")
-    tq_fig.update_layout(
-        title={"text": "Avg Teacher Qualification Rate by Province", "font": {"family": "Inter", "size": 13, "color": "#003366"}},
-        xaxis={"range": [0, 105], "gridcolor": "#F0F0F5", "ticksuffix": "%"}, yaxis={"gridcolor": "#F0F0F5"},
-        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={"family": "Inter", "size": 11},
-        margin={"l": 10, "r": 30, "t": 50, "b": 20}, height=380, showlegend=False,
-    )
-    st.plotly_chart(tq_fig, use_container_width=True)
-
-
-# =============================================================================
-# SECTION 9 — THE INTERVENTION SIMULATOR
-# =============================================================================
-st.markdown("""
-<div class="simulator-panel">
-    <div class="simulator-title">🎯 Policy Intervention Simulator</div>
-    <div class="simulator-subtitle">
-        Allocate simulated budget and select intervention strategy to project
-        the expected reduction in the OOSC rate across filtered districts.
+    # Custom legend
+    legend_html = """
+    <div style="position:fixed;bottom:24px;left:24px;z-index:1000;
+                background:white;padding:12px 16px;border-radius:10px;
+                box-shadow:0 4px 16px rgba(0,0,0,0.15);
+                font-family:DM Sans,sans-serif;font-size:11.5px;">
+        <div style="font-weight:700;color:#003366;margin-bottom:8px;font-size:12px;">
+            OOSC Severity Index
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+            <div style="width:14px;height:14px;border-radius:50%;background:#2CA02C;"></div>
+            <span style="color:#444;">Low (&lt;25%)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+            <div style="width:14px;height:14px;border-radius:50%;background:#E8860A;"></div>
+            <span style="color:#444;">Moderate (25–40%)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+            <div style="width:14px;height:14px;border-radius:50%;background:#D62728;"></div>
+            <span style="color:#444;">High (40–55%)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;">
+            <div style="width:14px;height:14px;border-radius:50%;background:#7B0D1E;"></div>
+            <span style="color:#444;">Critical (&gt;55%)</span>
+        </div>
     </div>
-""", unsafe_allow_html=True)
+    """
+    m.get_root().html.add_child(folium.Element(legend_html))
+    return m
 
-sim_left, sim_right = st.columns([2, 1], gap="large")
 
-with sim_left:
-    st.markdown('<div style="color:rgba(255,255,255,0.85);font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;">💰 Simulated Monthly Budget (PKR)</div>', unsafe_allow_html=True)
-    monthly_budget = st.slider("Budget", min_value=1_000_000, max_value=100_000_000, value=25_000_000, step=500_000, format="PKR %d", label_visibility="collapsed")
+# ─────────────────────────────────────────────────────────────────────────────
+# MAIN APP
+# ─────────────────────────────────────────────────────────────────────────────
+def main():
+    # ── Load Data ─────────────────────────────────────────────────────────────
+    raw_df = generate_education_data()
 
-    st.markdown('<div style="color:rgba(255,255,255,0.85);font-size:0.82rem;font-weight:600;margin-bottom:0.4rem;margin-top:1rem;">🔧 Intervention Strategy</div>', unsafe_allow_html=True)
-    strategy = st.radio("Strategy", options=["Infrastructure Upgrades", "Targeted Teacher Training", "Blended (50/50)"], horizontal=True, label_visibility="collapsed")
-
-    budget_millions = monthly_budget / 1_000_000
-
-    if strategy == "Infrastructure Upgrades":
-        elasticity, strategy_icon, schools_affected, notes = 0.012, "🏗️", int(budget_millions * 2.8), "WASH facilities, boundary walls, electricity & classrooms"
-    elif strategy == "Targeted Teacher Training":
-        elasticity, strategy_icon, schools_affected, notes = 0.019, "👩‍🏫", int(budget_millions * 1.2), "In-service training, mentoring & pedagogical coaching"
-    else: 
-        elasticity, strategy_icon, schools_affected, notes = ((0.012 + 0.019) / 2) * 1.10, "⚖️", int(budget_millions * 2.0), "Combined infrastructure + training — synergy premium applied"
-
-    projected_reduction_pct = min(budget_millions * elasticity, 35.0)
-    current_oosc = df["OOSC_Count"].sum()
-    children_reached = int(current_oosc * (projected_reduction_pct / 100))
-    annual_budget = monthly_budget * 12
-    cost_per_child = (annual_budget / children_reached) if children_reached > 0 else 0
-
-    budget_display = f"PKR {monthly_budget/1_000_000:.1f}M" if monthly_budget >= 10_000_000 else f"PKR {monthly_budget/1_000:,.0f}K"
-
-with sim_right:
-    # ── FIXED: USING ST.MARKDOWN INSTEAD OF ST.IMAGE ────────────────────────
-    st.markdown(f"""
-    <div class="sim-result-box">
-        <div style="font-size:1.8rem;margin-bottom:0.3rem">{strategy_icon}</div>
-        <div class="sim-result-value">{projected_reduction_pct:.2f}%</div>
-        <div class="sim-result-label">Projected OOSC Rate Reduction<br>per month · {strategy}</div>
-
-        <div class="sim-metric-row">
-            <div class="sim-metric">
-                <div class="sim-metric-val">{children_reached:,}</div>
-                <div class="sim-metric-lbl">Children Re-enrolled</div>
-            </div>
-            <div class="sim-metric">
-                <div class="sim-metric-val">{budget_display}</div>
-                <div class="sim-metric-lbl">Monthly Investment</div>
-            </div>
+    # ── Header Banner ─────────────────────────────────────────────────────────
+    st.markdown("""
+    <div class="ita-header">
+        <div class="ita-header-eyebrow">Idara-e-Taleem-o-Aagahi (ITA) · Parwaaz Fellowship</div>
+        <h1>Education Emergency &amp; ASER Data Tracker</h1>
+        <div class="ita-header-sub">
+            An interactive intelligence platform for monitoring out-of-school children,
+            foundational literacy outcomes, and infrastructure deficits across Pakistan's districts.
+            Built on ASER-calibrated synthetic indicators for evidence-based policymaking.
         </div>
-
-        <div class="sim-metric-row">
-            <div class="sim-metric">
-                <div class="sim-metric-val">{schools_affected:,}</div>
-                <div class="sim-metric-lbl">Schools Impacted</div>
-            </div>
-            <div class="sim-metric">
-                <div class="sim-metric-val">PKR {cost_per_child:,.0f}</div>
-                <div class="sim-metric-lbl">Annual Cost / Child</div>
-            </div>
-        </div>
-
-        <div style="margin-top:1rem;font-size:0.72rem;color:rgba(255,255,255,0.5);text-align:left;line-height:1.5;">
-            <em>{notes}</em>
-        </div>
+        <div class="ita-header-badge">⚡ Live Dashboard · 18 Districts · 4 Provinces</div>
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown("</div>", unsafe_allow_html=True)
+    # ── Global Filters ─────────────────────────────────────────────────────────
+    st.markdown('<div class="filter-label">🎛️ &nbsp;Global Filters</div>', unsafe_allow_html=True)
 
-st.markdown("<div style='margin-top:1rem'></div>", unsafe_allow_html=True)
+    filter_col1, filter_col2, filter_col3 = st.columns([2, 2, 4])
 
-progress_fig = go.Figure()
-progress_fig.add_trace(go.Bar(name="Current OOSC Rate", x=df["District"], y=df["OOSC_Rate"] * 100, marker_color="rgba(192, 57, 43, 0.7)"))
-projected_rates = df["OOSC_Rate"] * (1 - projected_reduction_pct / 100) * 100
-progress_fig.add_trace(go.Bar(name=f"Projected OOSC Rate", x=df["District"], y=projected_rates, marker_color="rgba(44, 160, 44, 0.75)"))
+    with filter_col1:
+        province_opts = ["All Provinces"] + sorted(raw_df["Province"].unique().tolist())
+        selected_province = st.selectbox("Province", province_opts, key="province_filter")
 
-progress_fig.update_layout(
-    barmode="group", title={"text": f"District-Level OOSC Rate: Before vs. After Intervention", "font": {"family": "Inter", "size": 13, "color": "#003366"}},
-    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={"family": "Inter", "size": 11, "color": "#4A4A6A"},
-    legend={"orientation": "h", "y": -0.22, "x": 0, "font": {"size": 11}},
-    xaxis={"gridcolor": "#F0F0F5", "tickangle": -35}, yaxis={"gridcolor": "#F0F0F5", "ticksuffix": "%"},
-    margin={"l": 10, "r": 20, "t": 60, "b": 80}, height=380,
-)
-st.plotly_chart(progress_fig, use_container_width=True)
+    with filter_col2:
+        zone_opts = ["All Zones", "Urban", "Rural"]
+        selected_zone = st.selectbox("Zone", zone_opts, key="zone_filter")
 
+    with filter_col3:
+        st.markdown("")  # spacer
 
-# =============================================================================
-# SECTION 10 — DATA TABLE (Expandable)
-# =============================================================================
-with st.expander("📋 View Full District Dataset", expanded=False):
-    display_df = df[["District", "Province", "Zone", "School_Age_Population", "OOSC_Count", "OOSC_Rate", "Literacy_Rate", "Dropout_Rate", "Infra_Deficit_Rate", "Teacher_Qualified_Rate", "School_Count", "GPI", "ROS"]].copy()
-    for col in ["OOSC_Rate", "Literacy_Rate", "Dropout_Rate", "Infra_Deficit_Rate", "Teacher_Qualified_Rate"]:
-        display_df[col] = display_df[col].apply(lambda x: f"{x*100:.1f}%")
-    display_df["GPI"]  = display_df["GPI"].apply(lambda x: f"{x:.2f}")
-    display_df["ROS"]  = display_df["ROS"].apply(lambda x: f"{x:.1f}")
-    display_df.columns = ["District", "Province", "Zone", "School-Age Pop.", "OOSC Count", "OOSC Rate", "Literacy Rate", "Dropout Rate", "Infra Deficit", "Teacher Qual. Rate", "Schools", "GPI", "ROS /100"]
-    st.dataframe(display_df, use_container_width=True, hide_index=True)
+    # ── Apply Filters ──────────────────────────────────────────────────────────
+    df = raw_df.copy()
+    if selected_province != "All Provinces":
+        df = df[df["Province"] == selected_province]
+    if selected_zone != "All Zones":
+        df = df[df["Zone"] == selected_zone]
 
+    # Graceful empty-state handler
+    if df.empty:
+        st.warning("⚠️ No data matches the current filter combination. Please adjust your selections.")
+        st.stop()
 
-# =============================================================================
-# SECTION 11 — FOOTER
-# =============================================================================
-st.markdown("""
-<div style="text-align:center;padding:2rem 0 1rem;color:#8896B0;font-size:0.78rem;">
-    <div style="font-weight:600;color:#003366;margin-bottom:0.3rem;">
-        ITA Education Emergency & ASER Data Tracker
+    # ── KPI Computations ───────────────────────────────────────────────────────
+    total_oosc       = df["OOSC_Count"].sum()
+    avg_literacy     = df["Literacy_Rate"].mean()
+    avg_infra_gap    = df["Infra_Lacking_Pct"].mean()
+    avg_opt_score    = df["Opt_Score"].mean()
+    total_children   = df["Total_Children"].sum()
+    oosc_national    = (total_oosc / total_children * 100) if total_children > 0 else 0
+
+    # ── KPI Row ────────────────────────────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <h2>Strategic Overview</h2>
+        <span class="section-pill">Key Performance Indicators</span>
     </div>
-    Synthetic data calibrated against ASER Pakistan (2021–2023) &amp; PSLM surveys ·
-    Built for the <strong>Parwaaz Internship</strong> application ·
-    <strong>Idara-e-Taleem-o-Aagahi (ITA)</strong>
-    <br><br>
-    <em>All figures are simulated for analytical demonstration.
-    Intervention projections use simplified linear elasticity models.</em>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+
+    k1, k2, k3, k4 = st.columns(4)
+
+    with k1:
+        st.markdown(kpi_card(
+            icon="👧🏽",
+            label="Total OOSC (Filtered)",
+            value=f"{total_oosc:,.0f}",
+            delta=f"▼ {oosc_national:.1f}% of child population",
+            color="red"
+        ), unsafe_allow_html=True)
+
+    with k2:
+        lit_delta = "▲ Above target" if avg_literacy >= 60 else "▼ Below 60% benchmark"
+        st.markdown(kpi_card(
+            icon="📖",
+            label="Avg Foundational Literacy",
+            value=f"{avg_literacy:.1f}%",
+            delta=lit_delta,
+            color="green" if avg_literacy >= 60 else "amber"
+        ), unsafe_allow_html=True)
+
+    with k3:
+        st.markdown(kpi_card(
+            icon="🏫",
+            label="Schools w/ Infra Deficit",
+            value=f"{avg_infra_gap:.1f}%",
+            delta="▼ Lacking water or sanitation",
+            color="amber"
+        ), unsafe_allow_html=True)
+
+    with k4:
+        st.markdown(kpi_card(
+            icon="📊",
+            label="Resource Optimization Score",
+            value=f"{avg_opt_score:.1f}",
+            delta="/ 100 composite index",
+            color="blue"
+        ), unsafe_allow_html=True)
+
+    st.markdown("<hr class='ita-divider'>", unsafe_allow_html=True)
+
+    # ── Geospatial Intelligence Map ────────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <h2>Geospatial Intelligence</h2>
+        <span class="section-pill">District Heat Map</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="map-container">', unsafe_allow_html=True)
+    folium_map = build_folium_map(df)
+    st_folium(folium_map, width=None, height=480, returned_objects=[])
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("<hr class='ita-divider'>", unsafe_allow_html=True)
+
+    # ── Diagnostic Analytics ───────────────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <h2>Diagnostic Analytics</h2>
+        <span class="section-pill">Enrollment · Dropout · Causes</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    chart_left, chart_right = st.columns([3, 2])
+
+    # ── Left: Stacked Bar — Enrollment vs Dropout ──────────────────────────────
+    with chart_left:
+        st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+        st.markdown('<div class="chart-title">📊 Enrollment vs. Active Dropout by District</div>', unsafe_allow_html=True)
+
+        bar_df = df.copy()
+        bar_df["Active_Dropout"] = (bar_df["Enrolled"] * bar_df["Dropout_Rate"] / 100).astype(int)
+        bar_df["Net_Enrolled"]   = bar_df["Enrolled"] - bar_df["Active_Dropout"]
+        bar_df_sorted = bar_df.nlargest(12, "OOSC_Count")
+
+        fig_bar = go.Figure()
+
+        fig_bar.add_trace(go.Bar(
+            name="Net Enrolled",
+            x=bar_df_sorted["District"],
+            y=bar_df_sorted["Net_Enrolled"],
+            marker_color="#003366",
+            marker_line_width=0,
+        ))
+        fig_bar.add_trace(go.Bar(
+            name="Active Dropout",
+            x=bar_df_sorted["District"],
+            y=bar_df_sorted["Active_Dropout"],
+            marker_color="#E8860A",
+            marker_line_width=0,
+        ))
+        fig_bar.add_trace(go.Bar(
+            name="Out-of-School",
+            x=bar_df_sorted["District"],
+            y=bar_df_sorted["OOSC_Count"],
+            marker_color="#C0392B",
+            marker_line_width=0,
+        ))
+
+        fig_bar.update_layout(
+            barmode="stack",
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=0, r=0, t=8, b=0),
+            height=360,
+            legend=dict(
+                orientation="h", yanchor="bottom", y=1.01,
+                xanchor="left", x=0,
+                font=dict(size=11, family="DM Sans"),
+                bgcolor="rgba(0,0,0,0)",
+            ),
+            xaxis=dict(
+                tickangle=-35,
+                tickfont=dict(size=10, family="DM Sans"),
+                gridcolor="rgba(0,0,0,0)",
+                linecolor="#DDE3EE",
+            ),
+            yaxis=dict(
+                tickfont=dict(size=10, family="DM Sans"),
+                gridcolor="#F0F2F8",
+                linecolor="rgba(0,0,0,0)",
+                tickformat=",",
+            ),
+            font=dict(family="DM Sans"),
+            hoverlabel=dict(font_size=12, font_family="DM Sans"),
+        )
+
+        st.plotly_chart(fig_bar, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # ── Right: Donut — Primary Dropout Causes ─────────────────────────────────
+    with chart_right:
+        st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+        st.markdown('<div class="chart-title">🔍 Primary Causes of Dropout</div>', unsafe_allow_html=True)
+
+        cause_values = [
+            df["Cause_Economic"].mean(),
+            df["Cause_Distance"].mean(),
+            df["Cause_ChildLabor"].mean(),
+            df["Cause_NoFacilities"].mean(),
+        ]
+        cause_labels = ["Economic Hardship", "Distance to School", "Child Labour", "Lack of Facilities"]
+        cause_colors = ["#003366", "#2CA02C", "#C0392B", "#E8860A"]
+
+        fig_donut = go.Figure(go.Pie(
+            labels=cause_labels,
+            values=cause_values,
+            hole=0.55,
+            marker=dict(colors=cause_colors, line=dict(color="white", width=2)),
+            textinfo="percent",
+            textfont=dict(size=11, family="DM Sans"),
+            hovertemplate="<b>%{label}</b><br>Avg Share: %{value:.1f}%<extra></extra>",
+        ))
+
+        fig_donut.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=0, r=0, t=8, b=0),
+            height=360,
+            showlegend=True,
+            legend=dict(
+                orientation="v",
+                font=dict(size=11, family="DM Sans"),
+                bgcolor="rgba(0,0,0,0)",
+                itemsizing="constant",
+            ),
+            annotations=[dict(
+                text="<b>Causes</b>",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=14, family="DM Serif Display", color="#003366"),
+            )],
+            hoverlabel=dict(font_size=12, font_family="DM Sans"),
+        )
+
+        st.plotly_chart(fig_donut, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("<hr class='ita-divider'>", unsafe_allow_html=True)
+
+    # ── Intervention Simulator ─────────────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <h2>Intervention Simulator</h2>
+        <span class="section-pill">Policymaker Tool</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="simulator-panel">', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="simulator-title">💡 Budget Allocation Engine</div>
+        <div class="simulator-subtitle">
+            Simulate the projected impact of monthly budget allocations on OOSC reduction.
+            Adjust parameters below to model different intervention strategies.
+        </div>
+    """, unsafe_allow_html=True)
+
+    sim_col1, sim_col2, sim_col3 = st.columns([2, 2, 2])
+
+    with sim_col1:
+        # Budget slider — styled via CSS override above
+        budget_pkr = st.slider(
+            "Simulated Monthly Budget (PKR)",
+            min_value=500_000,
+            max_value=50_000_000,
+            value=10_000_000,
+            step=500_000,
+            format="PKR %d",
+            key="budget_slider",
+            help="Set monthly intervention budget in Pakistani Rupees",
+        )
+
+    with sim_col2:
+        strategy = st.radio(
+            "Investment Strategy",
+            options=["🏗️ Infrastructure Upgrades", "👩‍🏫 Targeted Teacher Training"],
+            key="strategy_radio",
+            help="Choose how the budget is primarily allocated",
+        )
+
+    # ── Simulator Logic ────────────────────────────────────────────────────────
+    # Infrastructure: high capital cost per school; each school fixed reduces
+    # dropout by eliminating distance/facility barriers (~0.8% OOSC reduction
+    # per 10M PKR at base rate)
+    # Teacher Training: lower unit cost, scalable; improves retention and
+    # quality indicators (~1.2% OOSC reduction per 10M PKR at base rate)
+
+    base_oosc_rate   = df["OOSC_Pct"].mean()          # % of children OOSC
+    budget_in_crore  = budget_pkr / 10_000_000         # normalize to 10M PKR units
+
+    if "Infrastructure" in strategy:
+        efficiency_per_unit = 0.72    # % OOSC reduction per 10M PKR unit
+        cost_per_school     = 3_500_000  # PKR per school upgraded
+        cost_per_teacher    = 0
+        schools_reached     = int(budget_pkr / cost_per_school)
+        teachers_reached    = 0
+    else:
+        efficiency_per_unit = 1.15    # Teacher training is more cost-efficient
+        cost_per_school     = 0
+        cost_per_teacher    = 85_000   # PKR per teacher trained (monthly)
+        schools_reached     = 0
+        teachers_reached    = int(budget_pkr / cost_per_teacher)
+
+    # Diminishing returns: log scale dampening for large budgets
+    raw_reduction       = efficiency_per_unit * budget_in_crore
+    diminished_reduction = raw_reduction / (1 + 0.04 * budget_in_crore)
+    projected_reduction = min(diminished_reduction, base_oosc_rate * 0.65)  # cap at 65% of base
+    projected_new_oosc  = int(total_oosc * (1 - projected_reduction / 100))
+    children_reached    = max(0, total_oosc - projected_new_oosc)
+
+    with sim_col3:
+        st.markdown(f"""
+        <div class="sim-result-box">
+            <div class="sim-result-label">Projected OOSC Reduction</div>
+            <div class="sim-result-value">{projected_reduction:.1f}<span style="font-size:1.4rem">%</span></div>
+            <div class="sim-result-unit">≈ {children_reached:,} children re-enrolled</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Detail metrics row
+    d1, d2, d3, d4 = st.columns(4)
+
+    budget_fmt = f"PKR {budget_pkr/1_000_000:.1f}M"
+
+    metrics = [
+        ("Monthly Budget",        budget_fmt,                    "💰"),
+        ("Schools Upgraded" if schools_reached else "Teachers Trained",
+         f"{schools_reached:,}" if schools_reached else f"{teachers_reached:,}", "🏫" if schools_reached else "👩‍🏫"),
+        ("Post-Intervention OOSC", f"{projected_new_oosc:,}",    "📉"),
+        ("Cost per Child Reached", f"PKR {int(budget_pkr / max(children_reached, 1)):,}", "🎯"),
+    ]
+
+    for col, (label, value, icon) in zip([d1, d2, d3, d4], metrics):
+        with col:
+            st.markdown(f"""
+            <div class="sim-reach-item">
+                <div class="sim-reach-label">{icon} {label}</div>
+                <div class="sim-reach-value mono">{value}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)  # close simulator-panel
+
+    # ── Footer ─────────────────────────────────────────────────────────────────
+    st.markdown("""
+    <div style="text-align:center;padding:2.5rem 0 1rem 0;color:#8A9BB0;font-size:0.78rem;line-height:1.8;">
+        <strong style="color:#003366;">ITA Education Emergency &amp; ASER Data Tracker</strong>
+        &nbsp;·&nbsp; Built for the Parwaaz Internship Application
+        &nbsp;·&nbsp; Data is synthetic, ASER-calibrated for demonstration purposes
+        <br>
+        Framework: Streamlit · Plotly · Folium · Pandas · NumPy
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ENTRY POINT
+# ─────────────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    main()
