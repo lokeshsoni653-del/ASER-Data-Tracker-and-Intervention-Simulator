@@ -721,7 +721,7 @@ with chart_left:
         },
         xaxis_title="Children (5–16 years)",
         yaxis_title="",
-        paper_bgcolor="#FFFFFF",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",,
         plot_bgcolor="#FFFFFF",
         font={"family": "Inter", "size": 11, "color": "#4A4A6A"},
         legend={
@@ -789,7 +789,7 @@ with chart_right:
             "font": {"family": "Inter", "size": 14, "color": "#003366"},
             "x": 0.0, "xanchor": "left",
         },
-        paper_bgcolor="#FFFFFF",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",,
         font={"family": "Inter", "size": 11, "color": "#4A4A6A"},
         legend={
             "font": {"size": 11},
@@ -854,7 +854,7 @@ with deep_left:
     )
 
     scatter_fig.update_layout(
-        paper_bgcolor="#FFFFFF",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",,
         plot_bgcolor="#FFFFFF",
         font={"family": "Inter", "size": 11},
         xaxis={
@@ -925,7 +925,7 @@ with deep_right:
             "ticksuffix": "%",
         },
         yaxis={"gridcolor": "#F0F0F5"},
-        paper_bgcolor="#FFFFFF",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",,
         plot_bgcolor="#FFFFFF",
         font={"family": "Inter", "size": 11},
         margin={"l": 10, "r": 30, "t": 50, "b": 20},
@@ -1104,7 +1104,7 @@ progress_fig.update_layout(
     },
     xaxis_title="District",
     yaxis_title="OOSC Rate (%)",
-    paper_bgcolor="#FFFFFF",
+    paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",,
     plot_bgcolor="#FFFFFF",
     font={"family": "Inter", "size": 11, "color": "#4A4A6A"},
     legend={
